@@ -1,0 +1,24 @@
+--cpu Cortex-M0
+"accel\stm32f0xx_it.o"
+"accel\main.o"
+"accel\stm32f0xx_hal_msp.o"
+"accel\startup_stm32f042x6.o"
+"accel\stm32f0xx_hal_i2c_ex.o"
+"accel\stm32f0xx_hal_dma.o"
+"accel\stm32f0xx_hal_tim_ex.o"
+"accel\stm32f0xx_hal_flash.o"
+"accel\stm32f0xx_hal_rcc_ex.o"
+"accel\stm32f0xx_hal_flash_ex.o"
+"accel\stm32f0xx_hal_tim.o"
+"accel\stm32f0xx_hal_i2c.o"
+"accel\stm32f0xx_hal_pwr.o"
+"accel\stm32f0xx_hal_rcc.o"
+"accel\stm32f0xx_hal_gpio.o"
+"accel\stm32f0xx_hal_cortex.o"
+"accel\stm32f0xx_hal_pwr_ex.o"
+"accel\stm32f0xx_hal.o"
+"accel\system_stm32f0xx.o"
+--library_type=microlib --strict --scatter "accel\accel.sct"
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "accel.map" -o accel\accel.axf
