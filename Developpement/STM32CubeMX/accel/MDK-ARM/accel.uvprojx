@@ -134,11 +134,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4107</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -489,6 +489,21 @@
               <FileName>system_stm32f0xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/system_stm32f0xx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers/LIS3DH</GroupName>
+          <Files>
+            <File>
+              <FileName>lis3dh_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\LIS3DH\lis3dh_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>lis3dh_driver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Drivers\LIS3DH\lis3dh_driver.h</FilePath>
             </File>
           </Files>
         </Group>

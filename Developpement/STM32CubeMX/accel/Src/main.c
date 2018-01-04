@@ -41,7 +41,7 @@
 #include "stm32f0xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-#define SLAVEADRESS (0x18<<1)
+#define SLAVEADRESS (0x19<<1)
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
