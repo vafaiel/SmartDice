@@ -43,9 +43,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-
-/* Private variables ---------------------------------------------------------*/
-uint8_t accel_x[8];
+uint8_t response;
+uint8_t buffer[26]; 
+AxesRaw_t data;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -53,7 +53,6 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 
 /* Private function prototypes -----------------------------------------------*/
-
 uint16_t Register_out_x= 0x28;
 
 int main(void)
@@ -69,14 +68,38 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-
-	/* Verifying the bus status */		
-	volatile HAL_StatusTypeDef bus_status;
+	
+	//Inizialize MEMS Sensor (from LIS3DH driver example)
+  //set ODR (turn ON device)
+  response = LIS3DH_SetODR(LIS3DH_ODR_100Hz);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"\n\rSET_ODR_OK    \n\r\0");
+  }
+  //set PowerMode 
+  response = LIS3DH_SetMode(LIS3DH_NORMAL);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"SET_MODE_OK     \n\r\0");
+  }
+  //set Fullscale
+  response = LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"SET_FULLSCALE_OK\n\r\0");
+  }
+  //set axis Enable
+  response = LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"SET_AXIS_OK     \n\r\0");
+  }
 
   /* Infinite loop */
   while (1)
   {
-
+		//get Acceleration Raw data  
+		response = LIS3DH_GetAccAxesRaw(&data);
+		if(response == MEMS_SUCCESS){
+			//print data values
+			sprintf((char*)buffer, "X=%6d Y=%6d Z=%6d \r\n", data.AXIS_X, data.AXIS_Y, data.AXIS_Z);
+		}
   }
 }
 
