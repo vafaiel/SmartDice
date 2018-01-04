@@ -68,8 +68,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-	
-	//Inizialize MEMS Sensor (from LIS3DH driver example)
+  
+  //Inizialize MEMS Sensor (from LIS3DH driver example)
   //set ODR (turn ON device)
   response = LIS3DH_SetODR(LIS3DH_ODR_100Hz);
   if(response == MEMS_SUCCESS){
@@ -94,12 +94,12 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-		//get Acceleration Raw data  
-		response = LIS3DH_GetAccAxesRaw(&data);
-		if(response == MEMS_SUCCESS){
-			//print data values
-			sprintf((char*)buffer, "X=%6d Y=%6d Z=%6d \r\n", data.AXIS_X, data.AXIS_Y, data.AXIS_Z);
-		}
+    //get Acceleration Raw data  
+    response = LIS3DH_GetAccAxesRaw(&data);
+    if(response == MEMS_SUCCESS){
+      //print data values
+      sprintf((char*)buffer, "X=%6d Y=%6d Z=%6d \r\n", data.AXIS_X, data.AXIS_Y, data.AXIS_Z);
+    }
   }
 }
 
