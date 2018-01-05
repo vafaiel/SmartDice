@@ -39,84 +39,68 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f0xx_hal.h"
-
-/* USER CODE BEGIN Includes */
-#define SLAVEADRESS (0x18<<1)
-/* USER CODE END Includes */
+#include "lis3dh_driver.h"
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-
-/* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
-uint8_t accel_x[8];
-/* USER CODE END PV */
+uint8_t response;
+uint8_t buffer[26]; 
+AxesRaw_t data;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 
-/* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
-/* USER CODE END PFP */
-
-/* USER CODE BEGIN 0 */
 uint16_t Register_out_x= 0x28;
-
-
-/* USER CODE END 0 */
 
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-  /* USER CODE END 1 */
-
   /* MCU Configuration----------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-
-  /* USER CODE BEGIN 2 */
-	/* Verifying the bus status (TIMEOUT currently) */		
-volatile HAL_StatusTypeDef bus_status;
-
-
-	
-
-  /* USER CODE END 2 */
+  
+  //Inizialize MEMS Sensor (from LIS3DH driver example)
+  //set ODR (turn ON device)
+  response = LIS3DH_SetODR(LIS3DH_ODR_100Hz);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"\n\rSET_ODR_OK    \n\r\0");
+  }
+  //set PowerMode 
+  response = LIS3DH_SetMode(LIS3DH_NORMAL);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"SET_MODE_OK     \n\r\0");
+  }
+  //set Fullscale
+  response = LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"SET_FULLSCALE_OK\n\r\0");
+  }
+  //set axis Enable
+  response = LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
+  if(response == MEMS_SUCCESS){
+        sprintf((char*)buffer,"SET_AXIS_OK     \n\r\0");
+  }
 
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
-  /* USER CODE END WHILE */
-	//	HAL_I2C_Mem_Read(&hi2c1, SLAVEADRESS, Register_out_x, 1, accel_x, 1, 100); 
-		bus_status=HAL_I2C_IsDeviceReady(&hi2c1,SLAVEADRESS,1,1000);
-  //Configuration found from a project on GitHub
-	//	HAL_I2C_Mem_Read(&hi2c1, 0x33, 0x0F, 1, accel_x, 1, 100);
-  /* USER CODE BEGIN 3 */
-
+    //get Acceleration Raw data  
+    response = LIS3DH_GetAccAxesRaw(&data);
+    if(response == MEMS_SUCCESS){
+      //print data values
+      sprintf((char*)buffer, "X=%6d Y=%6d Z=%6d \r\n", data.AXIS_X, data.AXIS_Y, data.AXIS_Z);
+    }
   }
-  /* USER CODE END 3 */
-
 }
 
 /** System Clock Configuration
