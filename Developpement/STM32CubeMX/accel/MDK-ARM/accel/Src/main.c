@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -39,105 +39,75 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f0xx_hal.h"
-#include "lis3dh_driver.h"
 
-/* Defines -------------------------------------------------------------------*/
-#define DATA GPIO_PIN_4
-#define CLOCK GPIO_PIN_5
-#define LATCH GPIO_PIN_6
+/* USER CODE BEGIN Includes */
 
-//Macro converting binaries to actual binaries
-#define LongToBin(n) \
-(\
-((n >> 21) & 0x80) | \
-((n >> 18) & 0x40) | \
-((n >> 15) & 0x20) | \
-((n >> 12) & 0x10) | \
-((n >>  9) & 0x08) | \
-((n >>  6) & 0x04) | \
-((n >>  3) & 0x02) | \
-((n      ) & 0x01)   \
-)
-
-#define Bin(n) LongToBin(0x##n##l)
-
+/* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-uint8_t response;
-uint8_t buffer[26]; 
-AxesRaw_t data;
+
+/* USER CODE BEGIN PV */
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
-void LED_reset(void);
-void LED_write(uint8_t serial);
 
+/* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-uint16_t Register_out_x= 0x28;
+
+/* USER CODE END PFP */
+
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 
 int main(void)
 {
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
   /* MCU Configuration----------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  
-  //Inizialize MEMS Sensor (from LIS3DH driver example)
-  //set ODR (turn ON device)
-  response = LIS3DH_SetODR(LIS3DH_ODR_100Hz);
-  if(response == MEMS_SUCCESS){
-        sprintf((char*)buffer,"\n\rSET_ODR_OK    \n\r\0");
-  }
-  //set PowerMode 
-  response = LIS3DH_SetMode(LIS3DH_NORMAL);
-  if(response == MEMS_SUCCESS){
-        sprintf((char*)buffer,"SET_MODE_OK     \n\r\0");
-  }
-  //set Fullscale
-  response = LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
-  if(response == MEMS_SUCCESS){
-        sprintf((char*)buffer,"SET_FULLSCALE_OK\n\r\0");
-  }
-  //set axis Enable
-  response = LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
-  if(response == MEMS_SUCCESS){
-        sprintf((char*)buffer,"SET_AXIS_OK     \n\r\0");
-  }
-  //Turn on 1 LED
-	LED_write(Bin(10010000));
+
+  /* USER CODE BEGIN 2 */
+
+  /* USER CODE END 2 */
 
   /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
-    //get Acceleration Raw data  
-    response = LIS3DH_GetAccAxesRaw(&data);
-		if( data.AXIS_Z>16000)
-		{
-			LED_write(Bin(10000000));
-		}
-		if( data.AXIS_Z>13000 && data.AXIS_Z<16000)
-		{
-			LED_write(Bin(00010000));
-		}
-		if( data.AXIS_Z<13000)
-		{
-			LED_write(Bin(00000010));
-		}
-    if(response == MEMS_SUCCESS){
-      //print data values
-      sprintf((char*)buffer, "X=%6d Y=%6d Z=%6d \r\n", data.AXIS_X, data.AXIS_Y, data.AXIS_Z);
-    }
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
+
   }
+  /* USER CODE END 3 */
+
 }
 
 /** System Clock Configuration
@@ -198,7 +168,7 @@ static void MX_I2C1_Init(void)
 
   hi2c1.Instance = I2C1;
   hi2c1.Init.Timing = 0x2000090E;
-  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.OwnAddress1 = 48;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
   hi2c1.Init.OwnAddress2 = 0;
@@ -226,7 +196,12 @@ static void MX_I2C1_Init(void)
 
 }
 
-/** Pinout Configuration
+/** Configure pins as 
+        * Analog 
+        * Input 
+        * Output
+        * EVENT_OUT
+        * EXTI
 */
 static void MX_GPIO_Init(void)
 {
@@ -234,14 +209,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, SER_Pin|RCLK_Pin|SRCLK_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PA4 PA5 PA6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
+  /*Configure GPIO pins : SER_Pin RCLK_Pin SRCLK_Pin */
+  GPIO_InitStruct.Pin = SER_Pin|RCLK_Pin|SRCLK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -250,49 +224,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void LED_reset(void)
-{
-	HAL_GPIO_WritePin(GPIOA,DATA,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOA,LATCH,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,LATCH,GPIO_PIN_RESET);
-}
 
-void LED_write(uint8_t serial)
-{
-	for(int i=0; i<8; i++)
-	{
-		if ( (serial/128)>=1)
-		{
-			HAL_GPIO_WritePin(GPIOA,DATA,GPIO_PIN_SET);
-		}
-		else
-		{
-			HAL_GPIO_WritePin(GPIOA,DATA,GPIO_PIN_RESET);
-		}
-		HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA,CLOCK,GPIO_PIN_RESET);
-		serial=serial<<1;
-	}
-	HAL_GPIO_WritePin(GPIOA,LATCH,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOA,LATCH,GPIO_PIN_RESET);
-
-}
 /* USER CODE END 4 */
 
 /**
